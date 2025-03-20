@@ -1,0 +1,97 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @map("_id") @db.String
+  name      String?
+  email     String?  @unique
+  image     String?
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  order     Order[]
+  review    Review[]
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model Order {
+  id             String    @id @default(auto()) @map("_id") @db.ObjectId
+  amount         Float
+  currency       String
+  status         String
+  deliveryStatus String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  paymentItentId String    @unique
+  User           User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId         String?   @db.String
+  products       Product[]
+  address        Address?
+}
+
+type Product {
+  color      String
+  id         String
+  imageIndex Int
+  imageUrl   String
+  name       String
+  price      Float
+  quantity   Int
+}
+
+type Address {
+  city    String
+  country String
+  line1   String
+  line2   String
+}
+
+model products {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String
+  price       Float
+  brand       String
+  category    String
+  inStock     Boolean
+  quantity    Int?     @default(1)
+  images      Images[]
+  review      Review[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+type Images {
+  color     String
+  colorCode String?
+  image     String
+}
+
+model Review {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  productId  String    @db.String
+  rating     Int
+  comment    String
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  products   products? @relation(fields: [productsId], references: [id], onDelete: Cascade)
+  productsId String?   @db.ObjectId
+  User       User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String?   @db.String
+}
