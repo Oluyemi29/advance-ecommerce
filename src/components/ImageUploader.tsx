@@ -5,7 +5,6 @@ import React, { useCallback, useState } from "react";
 import axios from "axios";
 import { useDropzone } from "react-dropzone";
 import { DeleteCloudImage } from "@/Action/PaymentIntent";
-import { FidgetSpinner } from "react-loader-spinner";
 
 interface cloudinaryResponse {
   asset_id: string;
@@ -87,11 +86,7 @@ const ImageUploader = ({ uploadedImages, setUploadedImages }: ImageProps) => {
           )}
         </div>
         {error && <p className="text-red-600">{error}</p>}
-        {uploading && (
-          <p>
-            <FidgetSpinner />
-          </p>
-        )}
+        {uploading && <p>Loading...</p>}
         <div className=" flex gap-4">
           {uploadedImages.map((uploadedImage, index) => {
             return (
